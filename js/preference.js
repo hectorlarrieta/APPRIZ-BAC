@@ -1,8 +1,10 @@
 
+
 $( document ).on("tapend",".categoriaPref",function(){
 	$(this).toggleClass("active");
 	$(this).find('.fa').toggleClass("fa-check-circle").toggleClass("fa-circle-thin");
 });
+
 
 $( document ).on("tapend",".categoriaPref h6",function(e){
 	e.stopPropagation();
@@ -15,7 +17,7 @@ $( document ).on("tapend",".categoriaPref h6",function(e){
 		$(this).text($.t('More')) ;
 	}
 	
-})
+});
 
 
 $( document ).on("tapend",".preference",function(){
