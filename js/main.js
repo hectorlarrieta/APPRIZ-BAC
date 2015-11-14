@@ -86,20 +86,28 @@
 		
 	
 	$( document ).on("tapend","a.icon-back", function(){
-		
 				
 			$('header .icon-back').css("color", "#FFFFFF" );
 			$('header .icon-menu').css("color", "#FFFFFF" );
 		
 		if(!$.isEmptyObject(rulesChanges)){
-				showAlert($.t("Rule Changed"), $.t("Do you want to save changes?") , function(){
-					processRuleChange();
+			showAlert($.t("Rule Changed"), $.t("Do you want to save changes?") , function(){
+				processRuleChange();
+			},function(){
+				rulesChanges = {};
+			});
+			
+		}else {
+			if(!$.isEmptyObject(preferenceChanges)){
+				showAlert($.t("Preference Changed"), $.t("Do you want to save changes?") , function(){					
+					processPreferenceChange();
 				},function(){
-					rulesChanges = {};
-				});
-				
+					preferenceChanges = {};
+				});				
 			}
-			console.log(JSON.stringify(back));
+		}
+			
+		console.log(JSON.stringify(back));
 		var inBack = back.pop();
 		$('#pin').hide();
 		if(inBack == "undefined" ){	
