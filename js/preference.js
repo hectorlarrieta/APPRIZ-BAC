@@ -1,52 +1,24 @@
 
 
-
-var id_cliente=801;//45;//801;  //32
-
-function connectionAjax(url, dataObject, succesfulCallBack, typo){
-	$.ajax ({
-		url: url,
-		dataType: "json",
-		type: typo,
-		contentType: 'application/json',
-		data: JSON.stringify(dataObject),		
-		success: succesfulCallBack,
-		error : function (data){			
-			showInfoD($.t("Internet Connection"), $.t("Error saving prefferences.") , function(){	preferenceChanges = {};	});	    
-        }
 		
-	}).fail(function(data) {
-		console.log( data.responseText );
-	}).done(function(){ 
-		$('.refreshing_list').hide(); });
-}
-		
-function resetInformation() {
-	var url = 'http://10.60.0.142:9088/services/resetInformation';
-	var type = 'POST';
-	var data = {};
-	connectionAjax(url, data, function(data){		
-		showInfoD($.t("Reset"), $.t("Succesful reset prefferences.") , function(){	preferenceChanges = {};	});
-	}, type );
-}
 
-
-/*
-* funcion getPreference() obtiene  el objeto de preferencias de la entidad
-*/
 function getPreference() {
 	
 	$('.refreshing_list').show();
-	var url = 'http://10.60.0.142:9088/services/getPreference';
-	var type = 'GET';
-	var data = {};
-	connectionAjax(url, data, showPreference, type );
+	$.post('http://'+IP+':8089/appriz/getPreference',{},function(data){	
+		if (data["status"]== 200){
+			showPreference(data["preferences"]);
+		}
+		else{
+			showInfoD($.t("Internet Connection"), $.t("Error getting entity preferences.") , function(){	preferenceChanges = {};	});
+		}		
+	},'json') .fail(function(e) {
+		showInfoD($.t("Internet Connection"), $.t("Error getting entity preferences.") , function(){	preferenceChanges = {};	});
+		console.log( JSON.stringify(e) );	    
+	}).done(function(){$('.refreshing_list').hide(); });
+		
 }
 
-
-/*
-* funcion create(k, v, n) es recursiva, manejada por la fn showPreference
-*/
 function create(k, v, n) { 
 	//print cat
 	var row = "";
@@ -62,10 +34,6 @@ function create(k, v, n) {
 	return row;
 }
 
-
-/*
-* funcion hexToRGB() pasa un color en formato hexadecimal a formato RGB 
-*/
 function hexToRGB(str,alpha){
 	
     var re = /^#([A-Fa-f0-9]{2})([A-Fa-f0-9]{2})([A-Fa-f0-9]{2})/;
@@ -82,10 +50,6 @@ function hexToRGB(str,alpha){
     }
 } 
 
-
-/*
-* showPreference() llena el listView de preferencias
-*/
 function showPreference(data){
 
     var html = '<div style="margin-top: 113px;">';
@@ -113,26 +77,23 @@ function showPreference(data){
 	getPreferenceByUser();
 }
 
-
-/**
-* funcion getPreferenceByUser() obtiene la lista de preferencias de un cliente
-*/
 function getPreferenceByUser() {
 	
-	var id = {
-		"id": ""+id_cliente
-	};
-	
-	var url = 'http://10.60.0.142:9088/services/getPreferenceByUser';
-	var type = 'POST';
-	var data = id;
-	connectionAjax(url, data, showPreferenceByUser, type );
+	$('.refreshing_list').show();
+	$.post('http://'+IP+':8089/appriz/getPreferenceByUser',{"idSecretClient": idScretClient},function(data){	
+		if (data["status"]== 200){
+			showPreferenceByUser(data["preferences"]);
+		}
+		else{
+			showInfoD($.t("Internet Connection"), $.t("Error getting user preferences.") , function(){	preferenceChanges = {};	});
+		}					
+	},'json') .fail(function(e) {
+		showInfoD($.t("Internet Connection"), $.t("Error getting user preferences.") , function(){	preferenceChanges = {};	});
+		console.log( JSON.stringify(e) );	    
+	}).done(function(){$('.refreshing_list').hide(); });
+
 }
 
-
-/**
-* funcion showPreferenceByUser() pinta la lista de preferencias
-*/
 function showPreferenceByUser(data){
  
 	$.each(data, function(k, v) { 
@@ -146,7 +107,6 @@ function showPreferenceByUser(data){
 				$('span:contains('+k+')').closest(".categoriaPref").next().children('div:contains('+key+')').addClass("active").css("color", "rgb(221, 160, 221)");
 			});		
 		}
-
 	}); //each
 }
 
@@ -159,16 +119,14 @@ function processPreferenceChange() {
 	tmp_preferenceChange["information"]= new Object();
 	tmp_preferenceChange["preferences"]= new Object();
 
-	tmp_preferenceChange["id"] = id_cliente.toString();
+	tmp_preferenceChange["idSecretClient"] = idScretClient;
 
 
 	$(".categoria").each(function(){		
 		var name = $(this).find("span").html();
 		var hasOptionsSelected = false;
 		var created = false;
-
-		// como se llena el tab information del service sendCustomerInformation
-
+		
 	 	$(this).find(".preference").each(function(){			
 			if( $(this).hasClass("active") ) {
 				if(!created){
@@ -178,19 +136,26 @@ function processPreferenceChange() {
 				tmp_preferenceChange["preferences"][name][$(this).html()]= true;
 				hasOptionsSelected = true;				
 			}
-
 		});
 
 		if( $(this).find(".categoriaPref ").hasClass("active") && !hasOptionsSelected) {			
 			tmp_preferenceChange["preferences"][name]=true;			
 		}		
 		
-	});
+	});	
 	
-	var url = 'http://10.60.0.142:9088/services/sendCustomerInformation';
-	var type = 'POST';	
-	connectionAjax( url, tmp_preferenceChange, function(data){}, type );	
-	
+	$('.refreshing_list').show();
+	$.post('http://'+IP+':8089/appriz/sendCustomerInformation', tmp_preferenceChange,function(data){	
+		if (data["status"]== 200){
+			showInfoD($.t("Preferences"), $.t("Succesfully saved user preferences.") , function(){ preferenceChanges = {}; });
+		}
+		else{
+			showInfoD($.t("Preferences"), $.t("Error sending user preferences.") , function(){	preferenceChanges = {};	});
+		}
+	},'json') .fail(function(e) {
+		showInfoD($.t("Internet Connection"), $.t("Error sending user preferences.") , function(){	preferenceChanges = {};	});
+		console.log( JSON.stringify(e) );	    
+	}).done(function(){$('.refreshing_list').hide(); });		
 }
 
 // activa categoria
