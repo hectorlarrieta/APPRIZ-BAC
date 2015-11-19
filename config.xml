@@ -11,7 +11,7 @@
 	
 	
     <preference name="permissions" value="none" />
-    <preference name="phonegap-version" value="3.7.0" />
+        <preference name="phonegap-version" value="3.7.0" />
     <preference name="orientation" value="portrait" />
     <preference name="target-device" value="universal" />
     <preference name="fullscreen" value="true" />
@@ -29,10 +29,11 @@
 	
 
 
-
-<gap:plugin name="org.apache.cordova.device" version="0.2.12" />
+<gap:plugin name="com.phonegap.plugins.pushplugin" version="2.4.0" />
 
 <gap:plugin name="nl.x-services.plugins.toast" version="2.0.2" />
+
+<gap:plugin name="org.apache.cordova.device" version="0.2.12" />
 
 <gap:plugin name="org.apache.cordova.device-orientation" version="0.3.9" />
 
@@ -42,13 +43,12 @@
 
 <gap:plugin name="org.apache.cordova.file-transfer" version="0.4.6" />
 
-
 <gap:plugin name="org.apache.cordova.inappbrowser" version="0.5.2" />
 
-<gap:plugin name="com.phonegap.plugins.pushplugin" version="2.4.0" />
 <gap:plugin name="org.apache.cordova.network-information" version="0.2.12" />
 
 <gap:plugin name="org.apache.cordova.splashscreen" version="0.3.4" />
+
 
     <icon src="icon.png" />
     <icon gap:platform="android" gap:qualifier="ldpi" src="www/res/icon/android/icon-36-ldpi.png" />
